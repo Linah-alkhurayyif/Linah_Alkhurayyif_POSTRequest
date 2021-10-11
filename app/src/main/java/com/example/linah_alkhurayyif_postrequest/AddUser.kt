@@ -14,6 +14,7 @@ import retrofit2.Response
 import javax.security.auth.callback.Callback
 
 class AddUser : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_user)
@@ -23,12 +24,15 @@ class AddUser : AppCompatActivity() {
         }
 
         savebtn.setOnClickListener {
-            var Newuser = UserDetails.User(editTextName.text.toString(), editTextLocation.text.toString())
+            if(editTextName.text.toString()==""||editTextLocation.text.toString()==""){
+                Toast.makeText(applicationContext, "Can not submit empty data!!", Toast.LENGTH_SHORT).show()
+            }else{
             val progressDialog = ProgressDialog(this@AddUser)
             progressDialog.setMessage("Please wait")
             progressDialog.show()
+            var Newuser = UserDetails.User(editTextName.text.toString(), editTextLocation.text.toString(),null)
             val apiInterface = APIClient().getClient()?.create(APIInterface::class.java)
-            apiInterface!!.doaddUser(Newuser).enqueue(object : retrofit2.Callback<UserDetails.User>{
+            apiInterface!!.addUser(Newuser).enqueue(object : retrofit2.Callback<UserDetails.User>{
                 override fun onResponse(
                     call: retrofit2.Call<UserDetails.User>,
                     response: Response<UserDetails.User>
@@ -36,13 +40,13 @@ class AddUser : AppCompatActivity() {
                     progressDialog.dismiss()
                     editTextName.setText("")
                     editTextLocation.setText("")
-                    Toast.makeText(applicationContext, "Save Success!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(applicationContext, "Save Success!", Toast.LENGTH_SHORT).show()
                 }
 
                 override fun onFailure(call: retrofit2.Call<UserDetails.User>, t: Throwable) {
                     progressDialog.dismiss()
-                    Toast.makeText(applicationContext, ""+t.message, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(applicationContext, ""+t.message, Toast.LENGTH_SHORT).show()
                 }
             })
-        }
+        }}
     }}

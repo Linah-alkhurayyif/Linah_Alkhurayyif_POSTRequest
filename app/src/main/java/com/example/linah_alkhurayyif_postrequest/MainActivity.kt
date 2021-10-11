@@ -1,6 +1,8 @@
 package com.example.linah_alkhurayyif_postrequest
 
+import android.app.AlertDialog
 import android.app.ProgressDialog
+import android.content.DialogInterface
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -25,7 +27,7 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
         val apiInterface = APIClient().getClient()?.create(APIInterface::class.java)
-        val call: Call<List<UserDetails.User>>? = apiInterface!!.doGetListUser()
+        val call: Call<List<UserDetails.User>>? = apiInterface!!.getListUser()
         call?.enqueue(object : Callback<List<UserDetails.User>>{
             override fun onResponse(
                 call: Call<List<UserDetails.User>>,
@@ -33,21 +35,20 @@ class MainActivity : AppCompatActivity() {
             ) {
                 progressDialog.dismiss()
                 for (user in response.body()!!){
-                    userInfo.add(UserInfo(user.name.toString(),user.location.toString()))
-                    Log.d("TAG","${user.name.toString()} ${user.location.toString()}")
+                    userInfo.add(UserInfo(user.name.toString(),user.location.toString(),user.pk))
                 }
                 initializeRV()
             }
 
             override fun onFailure(call: Call<List<UserDetails.User>>, t: Throwable) {
                 progressDialog.dismiss()
-                Toast.makeText(applicationContext, ""+t.message, Toast.LENGTH_SHORT).show();
+                Toast.makeText(applicationContext, ""+t.message, Toast.LENGTH_SHORT).show()
             }
         })
 
 
     }
-    private fun initializeRV(){
+     private fun initializeRV(){
         recyclerView.adapter = UserAdapter(userInfo)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
